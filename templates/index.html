@@ -2,4 +2,9 @@
 
 {% block content %}
     <h1>{% block title %} Booklover's Friend {% endblock %}</h1>
+    <form action="/data" method = "POST">
+        <p><input type = "text" name = "Location" placeholder="Location"/></p>
+        <p><input type = "text" name = "Book-Title" placeholder="What did you last enjoy reading?"/></p>
+        <p><input type = "submit" value = "Submit" /></p>
+    </form>
 {% endblock %}
