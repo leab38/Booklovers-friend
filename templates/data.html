@@ -2,8 +2,6 @@
 
 {% block content %}
     <h1>{% block title %} Booklover's Friend {% endblock %}</h1>
-    {% for key,value in form_data.items() %}
-    <h2> {{key}}</h2>
-    <p> {{value}}</p>
-    {% endfor %}
+    <h2> Recommended Books By Location </h2>
+    {{book_list | safe}}
 {% endblock %}
