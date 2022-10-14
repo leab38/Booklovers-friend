@@ -3,4 +3,36 @@
 {% block content %}
     <h1>{% block title %} Booklover's Friend {% endblock %}</h1>
     <p>Booklover's Friend is a site dedicated to helping you figure out what to read next.</p>
+    <head>
+        <style>
+          .error {
+              color: red;
+          }
+        </style>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.17.0"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+      </head>
+      <body>
+        <div id="vis"></div>
+        <script>
+          (function(vegaEmbed) {
+            var spec = {"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"name": "data-636ea49a4789c3bf989fe3e1f900db1d"}, "mark": {"type": "bar", "color": "teal"}, "encoding": {"x": {"field": "Location", "title": "User Location", "type": "nominal"}, "y": {"field": "Count", "title": "Number of Users", "type": "quantitative"}}, "title": "Top 15 User Locations", "$schema": "https://vega.github.io/schema/vega-lite/v4.17.0.json", "datasets": {"data-636ea49a4789c3bf989fe3e1f900db1d": [{"Location": "london, england, united kingdom", "Count": 2506}, {"Location": "toronto, ontario, canada", "Count": 2250}, {"Location": "sydney, new south wales, australia", "Count": 1744}, {"Location": "melbourne, victoria, australia", "Count": 1708}, {"Location": "portland, oregon, usa", "Count": 1629}, {"Location": "chicago, illinois, usa", "Count": 1526}, {"Location": "seattle, washington, usa", "Count": 1484}, {"Location": "new york, new york, usa", "Count": 1411}, {"Location": "madrid, madrid, spain", "Count": 1400}, {"Location": "vancouver, british columbia, canada", "Count": 1359}, {"Location": "san diego, california, usa", "Count": 1277}, {"Location": "san francisco, california, usa", "Count": 1269}, {"Location": "ottawa, ontario, canada", "Count": 1243}, {"Location": "houston, texas, usa", "Count": 1187}, {"Location": "berlin, berlin, germany", "Count": 1173}, {"Location": "milano, lombardia, italy", "Count": 1157}, {"Location": "los angeles, california, usa", "Count": 1005}, {"Location": "austin, texas, usa", "Count": 986}, {"Location": "calgary, alberta, canada", "Count": 981}, {"Location": "barcelona, barcelona, spain", "Count": 905}]}};
+            var embedOpt = {"mode": "vega-lite"};
+      
+            function showError(el, error){
+                el.innerHTML = ('<div class="error" style="color:red;">'
+                                + '<p>JavaScript Error: ' + error.message + '</p>'
+                                + "<p>This usually means there's a typo in your chart specification. "
+                                + "See the javascript console for the full traceback.</p>"
+                                + '</div>');
+                throw error;
+            }
+            const el = document.getElementById('vis');
+            vegaEmbed("#vis", spec, embedOpt)
+              .catch(error => showError(el, error));
+          })(vegaEmbed);
+      
+        </script>
+      </body>
 {% endblock %}

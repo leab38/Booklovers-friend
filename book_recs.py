@@ -23,6 +23,15 @@ class DictEncoder(base.BaseEstimator, base.TransformerMixin):
 def bayes_sum(N, mu):
     return lambda x: (x.sum() + mu*N) / (x.count() + N)
 
+def thumbnails(df):
+    thumbnails = []
+    for index,row in df.iterrows():
+        image_link = row['Image-URL-S']
+        book_title = row['Book-Title']
+        thumbnail_url = f"<img src='{image_link}' alt='{book_title}'>"
+        thumbnails.append(thumbnail_url)
+    return thumbnails
+
 def get_similar_users(df_users, userid):
 
     # Pipeline to SVD the locations
@@ -50,7 +59,7 @@ def get_recs_by_loc(df_ratings,df_sim_users):
     lambda items: {i[2]: i[3] for i in items.itertuples()})
     features_mult = DictVectorizer().fit_transform(by_user_ratings_mult)
 
-    # Set up nearest neighbors to identify the similar books for users in this location
+    # Set up nearest neighbors to identify the book ratings for users in this location
     nn_mult = NearestNeighbors(n_neighbors=8, metric='cosine', algorithm='brute').fit(features_mult)
     dists, indices = nn_mult.kneighbors(features_mult)
     neighbors_mult = [by_user_ratings_mult.index[i] for i in indices[0]][1:]

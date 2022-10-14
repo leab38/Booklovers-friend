@@ -23,20 +23,39 @@ def index():
 def form():
     return render_template('index.html')
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 @app.route('/data/', methods = ['POST','GET'])
 def data():
     if request.method == 'GET':
         return f"You are trying to access /data directly, try going to /form instead to submit form."
     if request.method == 'POST':
+        # Get data submitted to the form
         form_data = request.form
-        new_df_bx_users = form_info.add_user(df_bx_users,form_data['Location'])
+        location = form_data['Location']
+        book = form_data['Book-Title']
+
+        # Add location as "new user" to users dataframe and get new user's ID
+        new_df_bx_users = form_info.add_user(df_bx_users,location)
         userid = len(new_df_bx_users)
-        new_df_bx_ratings = form_info.add_rating(df_bx_ratings,userid, form_info.get_isbn(df_bx_books,form_data['Book-Title']))
+
+        # Add rating line for "new user" with book submitted
+        new_df_bx_ratings = form_info.add_rating(df_bx_ratings,userid, form_info.get_isbn(df_bx_books,book))
+
+        # Based on location, get similar users and then recommendations based on similar users
         sim_users = book_recs.get_similar_users(new_df_bx_users,userid)
         book_rec_isbn = book_recs.get_recs_by_loc(new_df_bx_ratings,sim_users)
 
-        # book_list=df_bx_books[df_bx_books['ISBN'].isin(book_rec_isbn)][['Book-Title','Book-Author']].to_dict('records')
-        book_list_html=df_bx_books[df_bx_books['ISBN'].isin(book_rec_isbn)][['Book-Title','Book-Author']].to_html(index=False)
-        book_list = book_list_html.replace('table border="1"','table border="0"').replace('<tr style="text-align: right;">', '<tr style="text-align: left;">').replace('<th>', '<th align="left">')
+        # Filter booklist by ISBNs of book recs and add a cover column with image html
+        new_df_bx_books = df_bx_books[df_bx_books['ISBN'].isin(book_rec_isbn)]
+        # new_df_bx_books['Cover']=book_recs.thumbnails(new_df_bx_books)
+        new_df_bx_books.loc[:,('Cover')]=book_recs.thumbnails(new_df_bx_books)
 
-        return render_template('data.html',book_list = book_list)
+
+        # Translate dataframe to table format in HTML (render_links = True, escape = False to make covers display)
+        book_list_loc_html=new_df_bx_books[['Cover','Book-Title','Book-Author']].to_html(index=False,render_links=True,escape=False)
+        book_list_loc = book_list_loc_html.replace('table border="1"','table border="0"').replace('<tr style="text-align: right;">', '<tr style="text-align: left;">').replace('<th>', '<th align="left">')
+
+        return render_template('data.html',book_list_loc = book_list_loc, book=book, location=location)

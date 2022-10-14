@@ -2,6 +2,10 @@
 
 {% block content %}
     <h1>{% block title %} Booklover's Friend {% endblock %}</h1>
-    <h2> Recommended Books By Location </h2>
-    {{book_list | safe}}
+    <h2> Users in {{ location }} liked: </h2>
+    {{book_list_loc | safe}}
+    <br>
+    <br>
+    <h2> Users who liked {{ book }} also liked: </h2>
+    {{book_list_loc | safe}}
 {% endblock %}
