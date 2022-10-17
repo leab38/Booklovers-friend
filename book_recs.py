@@ -28,29 +28,33 @@ def thumbnails(df):
     for index,row in df.iterrows():
         image_link = row['Image-URL-S']
         book_title = row['Book-Title']
-        thumbnail_url = f"<img src='{image_link}' alt='{book_title}'>"
+        isbn = row['ISBN']
+        thumbnail_url = f'<a href="/book/{isbn}"><img src={image_link} alt={book_title}>'
         thumbnails.append(thumbnail_url)
     return thumbnails
 
 def get_similar_users(df_users, userid):
 
-    # Pipeline to SVD the locations
-    loc_pipe = Pipeline([('encoder',DictEncoder('Location')),
-                    ('vectorizer', DictVectorizer()),
-                    ('svd', TruncatedSVD(n_components=100))])
+    # # Pipeline to SVD the locations
+    # loc_pipe = Pipeline([('encoder',DictEncoder('Location')),
+    #                 ('vectorizer', DictVectorizer()),
+    #                 ('svd', TruncatedSVD(n_components=100))])
     
-    features = loc_pipe.fit_transform(df_users)
+    # features = loc_pipe.fit_transform(df_users)
 
-    # Set up KNN for 20 neighbors fitting the locations
-    nn = NearestNeighbors(n_neighbors=20).fit(features)
-    nn.fit(features)
+    # # Set up KNN for 20 neighbors fitting the locations
+    # nn = NearestNeighbors(n_neighbors=500).fit(features)
+    # nn.fit(features)
 
-    # Use the results of the KNN to find other users in a similar location based on truncated SVD
-    dists, indices = nn.kneighbors([features[len(df_users.index)-1]])
-    return df_users.iloc[indices[0]]
+    # # Use the results of the KNN to find other users in a similar location based on truncated SVD
+    # dists, indices = nn.kneighbors([features[len(df_users.index)-1]])
+    # return df_users.iloc[indices[0]]
 
-def get_recs_by_loc(df_ratings,df_sim_users):
+    location = df_users['Location'].iloc[userid-1]
+    return df_users[df_users['Location'].str.contains(location,na=False)]
 
+def get_recs_by_loc(df_users,df_ratings,userid):
+    df_sim_users = get_similar_users(df_users,userid)
     # Filter df_ratings by only the "closest" users
     sim_user_ratings = df_ratings[df_ratings['User-ID'].isin(df_sim_users.index)]
 
@@ -59,8 +63,13 @@ def get_recs_by_loc(df_ratings,df_sim_users):
     lambda items: {i[2]: i[3] for i in items.itertuples()})
     features_mult = DictVectorizer().fit_transform(by_user_ratings_mult)
 
+    # Just in case the value is smaller than the NearestNeighbors value
+    if features_mult.size <10:
+        nn_num = features_mult.size
+    else:
+        nn_num=10
     # Set up nearest neighbors to identify the book ratings for users in this location
-    nn_mult = NearestNeighbors(n_neighbors=8, metric='cosine', algorithm='brute').fit(features_mult)
+    nn_mult = NearestNeighbors(n_neighbors=nn_num, metric='cosine', algorithm='brute').fit(features_mult)
     dists, indices = nn_mult.kneighbors(features_mult)
     neighbors_mult = [by_user_ratings_mult.index[i] for i in indices[0]][1:]
     ratings_grp_mult = df_ratings[df_ratings['User-ID'].isin(neighbors_mult)].groupby('ISBN')['Book-Rating']

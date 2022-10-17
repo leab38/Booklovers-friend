@@ -30,7 +30,7 @@ def about():
 @app.route('/data/', methods = ['POST','GET'])
 def data():
     if request.method == 'GET':
-        return f"You are trying to access /data directly, try going to /form instead to submit form."
+        return f"You are trying to access /data directly, try going to <a href='\'>the homepage</a> instead to submit form."
     if request.method == 'POST':
         # Get data submitted to the form
         form_data = request.form
@@ -45,8 +45,7 @@ def data():
         new_df_bx_ratings = form_info.add_rating(df_bx_ratings,userid, form_info.get_isbn(df_bx_books,book))
 
         # Based on location, get similar users and then recommendations based on similar users
-        sim_users = book_recs.get_similar_users(new_df_bx_users,userid)
-        book_rec_isbn = book_recs.get_recs_by_loc(new_df_bx_ratings,sim_users)
+        book_rec_isbn = book_recs.get_recs_by_loc(new_df_bx_users,new_df_bx_ratings,userid)
 
         # Filter booklist by ISBNs of book recs and add a cover column with image html
         new_df_bx_books = df_bx_books[df_bx_books['ISBN'].isin(book_rec_isbn)]
@@ -59,3 +58,8 @@ def data():
         book_list_loc = book_list_loc_html.replace('table border="1"','table border="0"').replace('<tr style="text-align: right;">', '<tr style="text-align: left;">').replace('<th>', '<th align="left">')
 
         return render_template('data.html',book_list_loc = book_list_loc, book=book, location=location)
+
+@app.route('/book/<isbn>')
+def bookdetails(isbn):
+    book = df_bx_books[df_bx_books['ISBN']==isbn].to_dict(orient='records')[0]
+    return render_template('book_details.html', book = book)

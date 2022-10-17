@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} Booklover's Friend {% endblock %}</h1>
+    <h2> Users in {{ location }} liked: </h2>
+
+    {% for key,value in book_list_loc.items() %}
+    <table border="0">
+        <thead>
+            <tr style="text-align: left;">
+                <th align="left">{{ key }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <td align="left"> {{ value }}
+            </td>            
+        </tbody>
+    {% endfor %}
+    
+{% endblock %}
