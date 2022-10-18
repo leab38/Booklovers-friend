@@ -4,9 +4,9 @@ def add_user(df, location):
     df.loc[len(df)+1]=data
     return df #new user id
 
-def add_rating(df, userid, isbn, rating=4):
-    # Assuming enjoyed = rating of at least 4
-    data=[userid, isbn, rating]
+def add_rating(df, userid, isbn, rating=5,count=1):
+    # Form ask for last 5 star book, hence rating = 5
+    data=[userid, isbn, rating, count]
     df.loc[len(df)+1]=data
     return df
 

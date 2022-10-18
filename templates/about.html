@@ -2,7 +2,19 @@
 
 {% block content %}
     <h1>{% block title %} Booklover's Friend {% endblock %}</h1>
-    <p>Booklover's Friend is a site dedicated to helping you figure out what to read next.</p>
+    <body bgcolor="whitesmoke">
+    <p>Booklover's Friend is a site dedicated to helping you figure out what to read next. The site's algorithm is using two datasets to provide you with recommendations based on your location and your last "5 star" read.</p>
+    <h2><a href="http://www2.informatik.uni-freiburg.de/~cziegler/BX/">Book Crossing (BX) Dataset</a></h2>
+    <ul>
+      <li>Books and Users: Over <strong>250,000</strong> including user locations</li>
+      <li>Ratings: Over 1 million</li>
+    </ul>
+    <h2><a href="https://github.com/zygmuntz/goodbooks-10k">Goodreads Dataset</a></h2>
+    <ul>
+      <li>Books: 10,000</li>
+      <li>Ratings: 6 million</li>
+    </ul>
+  </body>
     <head>
         <style>
           .error {

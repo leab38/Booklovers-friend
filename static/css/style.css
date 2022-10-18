@@ -62,3 +62,6 @@ a.button {
     text-decoration: none;
     color: initial;
 }
+a {
+    color: lightseagreen;
+}
