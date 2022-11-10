@@ -65,3 +65,8 @@ a.button {
 a {
     color: lightseagreen;
 }
+
+footer {
+    background-color: lightgrey;
+    margin: 100px;
+}

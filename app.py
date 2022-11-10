@@ -13,7 +13,7 @@ df_bx_ratings = pd.read_csv('BX-Book-Ratings.csv', low_memory=False, encoding='u
 df_bx_ratings['ratings_count']=df_bx_ratings.groupby('User-ID')['User-ID'].transform('count')
 
 # import bx books dataset
-df_bx_books = pd.read_csv('BX-Books-fixed.csv', encoding='unicode-escape',sep=';',quotechar='"', error_bad_lines=False)
+df_bx_books = pd.read_csv('BX-Books-fixed.csv', encoding='unicode-escape',sep=';',quotechar='"', on_bad_lines='warn')
 
 # Add cover html for link + cover image column
 df_bx_books.loc[:,('Cover')]=book_recs.thumbnails(df_bx_books)

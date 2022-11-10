@@ -55,24 +55,27 @@ def get_similar_users(df_users, userid):
 
 def get_recs_by_loc(df_users,df_ratings,userid):
     df_sim_users = get_similar_users(df_users,userid)
+
     # Filter df_ratings by only the "closest" users
     sim_user_ratings = df_ratings[df_ratings['User-ID'].isin(df_sim_users.index)]
+    ratings_grp_mult = sim_user_ratings.groupby('ISBN')['Book-Rating']
 
-    # Group users with similar ratings
-    by_user_ratings_mult = sim_user_ratings.groupby('User-ID').apply(
-    lambda items: {i[2]: i[3] for i in items.itertuples()})
-    features_mult = DictVectorizer().fit_transform(by_user_ratings_mult)
+    # # Group users with similar ratings
+    # by_user_ratings_mult = sim_user_ratings.groupby('User-ID').apply(
+    # lambda items: {i[2]: i[3] for i in items.itertuples()})
+    # features_mult = DictVectorizer().fit_transform(by_user_ratings_mult)
 
-    # Just in case the value is smaller than the NearestNeighbors value
-    if features_mult.size <10:
-        nn_num = features_mult.size
-    else:
-        nn_num=10
-    # Set up nearest neighbors to identify the book ratings for users in this location
-    nn_mult = NearestNeighbors(n_neighbors=nn_num, metric='cosine', algorithm='brute').fit(features_mult)
-    dists, indices = nn_mult.kneighbors(features_mult)
-    neighbors_mult = [by_user_ratings_mult.index[i] for i in indices[0]][1:]
-    ratings_grp_mult = df_ratings[df_ratings['User-ID'].isin(neighbors_mult)].groupby('ISBN')['Book-Rating']
+    # # Just in case the value is smaller than the NearestNeighbors value
+    # if features_mult.size <10:
+    #     nn_num = features_mult.size
+    # else:
+    #     nn_num=10
+
+    # # Set up nearest neighbors to identify the book ratings for users in this location
+    # nn_mult = NearestNeighbors(n_neighbors=nn_num, metric='cosine', algorithm='brute').fit(features_mult)
+    # dists, indices = nn_mult.kneighbors(features_mult)
+    # neighbors_mult = [by_user_ratings_mult.index[i] for i in indices[0]][1:]
+    # ratings_grp_mult = df_ratings[df_ratings['User-ID'].isin(neighbors_mult)].groupby('ISBN')['Book-Rating']
 
     # Calculate Bayes sum for user ratings and return top 5 books based on Bayes sum
     return ratings_grp_mult.aggregate(bayes_sum(5,3)).sort_values(ascending = False).head().index.tolist()
