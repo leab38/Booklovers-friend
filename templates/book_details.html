@@ -2,12 +2,12 @@
 
 {% block content %}
     <h1>{% block title %} Booklover's Friend {% endblock %}</h1>
-    <img src="{{ book['Image-URL-M'] }}" alt="{{ book['Book-Title'] }} Book Cover">
-    <h2>{{ book['Book-Title'] }}</h2>
-    <h3>Written by: {{ book['Book-Author'] }}</h3>
+    <img src="{{ book['image_m'] }}" alt="{{ book['title'] }} Book Cover">
+    <h2>{{ book['title'] }}</h2>
+    <h3>Written by: {{ book['authors'] }}</h3>
     <body>
-        First published in: {{ book['Year-Of-Publication'] }}<br>
-        Publisher: {{ book['Publisher'] }}<br>
+        First published in: {{ book['pub_year'] }}<br>
+        Publisher: {{ book['publisher'] }}<br>
     </body>
     <a href="\" class="button">Search Again</a>
 

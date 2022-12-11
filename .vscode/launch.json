@@ -13,8 +13,18 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["--output_directory_path","google_json","--format","csv"]
-        }
+            "args": ["--output_directory_path","google_json","--format","csv", "--filename", "books_final.csv"]
+        },
+        
+        {
+            "name": "Python: Google Missing",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--output_directory_path","missing_json","--format","csv","--filename", "bx_missing_books.csv"]
+        },
 
         {
             "name": "Python: GR",
@@ -24,6 +34,38 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": ["--output_directory_path","json","--format","csv"]
+        },
+
+        {
+            "name": "Python: Merge CSV",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--output_directory_path","/","--format","csv", "--update","Yes",
+                    "--sql_books","No","--sql_users","No","--sql_ratings","No"]
+        },
+
+        {
+            "name": "Python: Merge SQL",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--output_directory_path","/","--format","sql","--update","No",
+                    "--sql_books","No","--sql_users","No","--sql_ratings","Yes"]
+        },
+
+        {
+            "name": "Python: Save Model",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--output_directory_path","/","--ratings","ratings_final.csv"]
         }
 
     ]

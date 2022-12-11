@@ -3,17 +3,83 @@
 {% block content %}
     <h1>{% block title %} Booklover's Friend {% endblock %}</h1>
     <body bgcolor="whitesmoke">
-    <p>Booklover's Friend is a site dedicated to helping you figure out what to read next. The site's algorithm is using two datasets to provide you with recommendations based on your location and your last "5 star" read.</p>
-    <h2><a href="http://www2.informatik.uni-freiburg.de/~cziegler/BX/">Book Crossing (BX) Dataset</a></h2>
+    <p>Booklover's Friend is a site dedicated to helping you figure out what to read next. This website uses two datasets to provide you with recommendations based on your location and your last "5 star" read.</p>
+    <h2>Recommendation Engine</h2>
+    <p>The recommendation engine for Booklover's Friend does the following:
+      <ol>
+        <li>Compares your location entered to the other user locations and makes a recommendation based on the ratings of other users in your location.</li>
+        <li>Uses a K-Nearest Neighbors algorithm to find the highest ratings of other users who liked the same book that you entered.</li>
+        <li>Ratings are compared using a Bayesian prior to smooth the ratings and give less popular books a chance to be recommended.</li>
+      </ol>
+    </p>
+    <h2>Datasets</h2>
+      <h3><a href="http://www2.informatik.uni-freiburg.de/~cziegler/BX/">Book Crossing (BX) Dataset</a></h3>
     <ul>
       <li>Books and Users: Over <strong>250,000</strong> including user locations</li>
-      <li>Ratings: Over 1 million</li>
+      <li>Ratings: Over <strong>1 million</strong></li>
     </ul>
-    <h2><a href="https://github.com/zygmuntz/goodbooks-10k">Goodreads Dataset</a></h2>
+    <h3><a href="https://github.com/zygmuntz/goodbooks-10k">Goodreads Dataset</a></h3>
     <ul>
-      <li>Books: 10,000</li>
-      <li>Ratings: 6 million</li>
+      <li>Books: <strong>10,000</strong></li>
+      <li>Ratings: <strong>6 million</strong></li>
     </ul>
+    <h3>Data Pre-Processing</h3>
+    <h4>Data Analysis</h4>
+    <p>Given the difference in sizes of the datasets, I first began by making a minimum viable product with the Book Crossing dataset. 
+      This involved importing the dataset and then understanding how it was structured. 
+      The Book Crossing dataset had three files: BX-books, BX-users, BX-ratings. 
+      The books were identified in both the books and ratings file with the ISBN. 
+      The users had a numeric user ID assigned, which is present in both the BX-users file and the BX-ratings file.</p>
+    <p>Once my model was working with the Book Crossing dataset, then I looked next into merging the data 
+      from the Book Crossing and Goodreads datasets. There were three separate merges required: the book
+      lists, the user lists, and the user ratings. The merge had to take into account these 
+      particularities of the data:
+    <ol>
+      <li>The Book Crossing dataset had the ISBN as primary key for the books. The Goodreads dataset 
+          instead had its own unique "book_id". In fact, the Goodreads dataset had multiple book IDs: 
+          book_id, goodreads_book_id, works_id, isbn, isbn13, and more!</li>
+      <li>Some of the Goodreads dataset (700 books) did not have an ISBN. Since ISBN was the link between
+          the datsets and the only overlapping book identification number, this had to be resolved by scraping 
+          Goodreads for updated information to ensure all books have an ISBN.
+      </li>
+      <li>The book list merging included:</li>
+      <ul>
+        <li>Find and replace missing ISBNs for Goodreads books.</li>
+        <li>Merge the two datasets.</li>
+        <li>For books that were in both datasets, compare overlapping column data, which includes: title, author(s), year of publication, book cover URLs.</li>
+        <li>I decided to keep the title from the Book Crossing dataset, as I found less broken/missing 
+            letters in titles that were not in English.
+        </li>
+        <li>I kept the authors from the Goodreads dataset, as a review of a sample of these was more accurate.</li>
+        <li>For year of publication and image URLs the Book Crossing dataset was kept as default.</li>
+      </ul>
+      <li>The user list merge was simpler than the booklist (as there were fewer elements). The steps were the below:</li>
+      <ul>
+        <li>The Goodreads dataset did not have a user list, only the users listed in the ratings list. 
+            In order to be able to merge the two, I created a user list with the unique user IDs and added
+            columns for age and location (with Null values) to match the Book Crossing dataset.
+        </li>
+        <li>Pre-pend an identifier for the user_id to avoid duplicates. (BX: Book Crossing, GR: Goodreads).</li>
+        <li>Add a source column to say whether the user was a Goodreads or Book Crossing user.</li>
+      </ul>
+      <li>The ratings list merge had a few pre-processing steps before the merge could be completed:</li>
+      <ul>
+        <li>The Goodreads book list had to have all null ISBNs filled in with the correct numbers before proceeding.</li>
+        <li>Since the Goodreads book list had its own book_id that was being used as a primary key, I added an 
+          ISBN column to the Goodreads ratings list.</li>
+      </ul>
+    </ol></p>
+    <h3>Model Creation</h3>
+    <p>The recommendation model groups all of the user ratings based on user ID and then uses the
+        DictVectorizer package to create the feature matrix. This feature matrix is then fed into a 
+        K-Nearest Neighbors algorithm to provide a list of similar users based on the books rated.
+        I then pickled the model using joblib to reduce the amount of data to be loaded into memory and 
+        load only the pre-fit model on the website to provide the recommendations.
+    </p>
+    <h3>Final Product</h3>
+    <p>The Booklover's Friend website was built using the Python Flask framework. The About Page graph
+        was made using Altair.
+    </p>
   </body>
     <head>
         <style>
@@ -29,7 +95,7 @@
         <div id="vis"></div>
         <script>
           (function(vegaEmbed) {
-            var spec = {"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"name": "data-636ea49a4789c3bf989fe3e1f900db1d"}, "mark": {"type": "bar", "color": "teal"}, "encoding": {"x": {"field": "Location", "title": "User Location", "type": "nominal"}, "y": {"field": "Count", "title": "Number of Users", "type": "quantitative"}}, "title": "Top 15 User Locations", "$schema": "https://vega.github.io/schema/vega-lite/v4.17.0.json", "datasets": {"data-636ea49a4789c3bf989fe3e1f900db1d": [{"Location": "london, england, united kingdom", "Count": 2506}, {"Location": "toronto, ontario, canada", "Count": 2250}, {"Location": "sydney, new south wales, australia", "Count": 1744}, {"Location": "melbourne, victoria, australia", "Count": 1708}, {"Location": "portland, oregon, usa", "Count": 1629}, {"Location": "chicago, illinois, usa", "Count": 1526}, {"Location": "seattle, washington, usa", "Count": 1484}, {"Location": "new york, new york, usa", "Count": 1411}, {"Location": "madrid, madrid, spain", "Count": 1400}, {"Location": "vancouver, british columbia, canada", "Count": 1359}, {"Location": "san diego, california, usa", "Count": 1277}, {"Location": "san francisco, california, usa", "Count": 1269}, {"Location": "ottawa, ontario, canada", "Count": 1243}, {"Location": "houston, texas, usa", "Count": 1187}, {"Location": "berlin, berlin, germany", "Count": 1173}, {"Location": "milano, lombardia, italy", "Count": 1157}, {"Location": "los angeles, california, usa", "Count": 1005}, {"Location": "austin, texas, usa", "Count": 986}, {"Location": "calgary, alberta, canada", "Count": 981}, {"Location": "barcelona, barcelona, spain", "Count": 905}]}};
+            var spec = {"config": {"view": {"continuousWidth": 800, "continuousHeight": 500}}, "data": {"name": "data-636ea49a4789c3bf989fe3e1f900db1d"}, "mark": {"type": "bar", "color": "teal"}, "encoding": {"x": {"field": "Location", "title": "User Location", "type": "nominal"}, "y": {"field": "Count", "title": "Number of Users", "type": "quantitative"}}, "title": "Top 15 User Locations", "$schema": "https://vega.github.io/schema/vega-lite/v4.17.0.json", "datasets": {"data-636ea49a4789c3bf989fe3e1f900db1d": [{"Location": "london, england, united kingdom", "Count": 2506}, {"Location": "toronto, ontario, canada", "Count": 2250}, {"Location": "sydney, new south wales, australia", "Count": 1744}, {"Location": "melbourne, victoria, australia", "Count": 1708}, {"Location": "portland, oregon, usa", "Count": 1629}, {"Location": "chicago, illinois, usa", "Count": 1526}, {"Location": "seattle, washington, usa", "Count": 1484}, {"Location": "new york, new york, usa", "Count": 1411}, {"Location": "madrid, madrid, spain", "Count": 1400}, {"Location": "vancouver, british columbia, canada", "Count": 1359}, {"Location": "san diego, california, usa", "Count": 1277}, {"Location": "san francisco, california, usa", "Count": 1269}, {"Location": "ottawa, ontario, canada", "Count": 1243}, {"Location": "houston, texas, usa", "Count": 1187}, {"Location": "berlin, berlin, germany", "Count": 1173}, {"Location": "milano, lombardia, italy", "Count": 1157}, {"Location": "los angeles, california, usa", "Count": 1005}, {"Location": "austin, texas, usa", "Count": 986}, {"Location": "calgary, alberta, canada", "Count": 981}, {"Location": "barcelona, barcelona, spain", "Count": 905}]}};
             var embedOpt = {"mode": "vega-lite"};
       
             function showError(el, error){

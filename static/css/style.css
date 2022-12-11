@@ -5,6 +5,7 @@ h1 {
 h2 {
     color: lightcyan;
 }
+
 table {
     margin: 10px;
 }
@@ -23,7 +24,9 @@ td {
 body {
     color: whitesmoke;
     font-size: larger;
-    background-image: url("https://upload.wikimedia.org/wikipedia/commons/5/5a/Books_HD_%288314929977%29.jpg");
+    /* background: url("https://upload.wikimedia.org/wikipedia/commons/5/5a/Books_HD_%288314929977%29.jpg"),linear-gradient(to bottom, rgba(0, 0, 0, 0.75), transparent); */
+    background: url("https://images.pexels.com/photos/1643408/pexels-photo-1643408.jpeg");
+    background-repeat: no-repeat;
 }
 input[type=text]{
     padding: 10px;
@@ -67,6 +70,12 @@ a {
 }
 
 footer {
-    background-color: lightgrey;
     margin: 100px;
 }
+
+
+
+/* ul {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+
+} */

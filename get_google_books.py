@@ -30,29 +30,37 @@ def get_thumbnail(imageLinks, type):
 def scrape_book(isbn):
     if isbn: # BX dataset only has ISBN. Most of the GR dataset also, but some... do not.
         url = 'https://www.googleapis.com/books/v1/volumes'
+    else:
+        return ''
         
     response = requests.get(url, params={"q": 'isbn:'+isbn})
     json = response.json()
-    time.sleep(2)
+    time.sleep(3)
 
-    if json['totalItems']!=0:
-        volume_info = json['items'][0]['volumeInfo']
-        return {'goog_id':              get_id(json),
-                'book_title':           get_volume_info(volume_info,'title'),
-                'book_link':            get_volume_info(volume_info, 'infoLink'),
-                'isbn':                 isbn,
-                'year_first_published': get_volume_info(volume_info,'publishedDate'),
-                'publisher':            get_volume_info(volume_info,'publisher'),
-                'author':               get_volume_info(volume_info,'authors'),
-                'num_pages':            get_volume_info(volume_info,'pageCount'),
-                'description':          get_volume_info(volume_info,'description'),
-                'genres':               get_volume_info(volume_info,'categories'),
-                'num_ratings':          get_volume_info(volume_info,'ratingsCount'),
-                'average_rating':       get_volume_info(volume_info,'averageRating'),
-                'image-S':              get_thumbnail(get_volume_info(volume_info,'imageLinks'),'smallThumbnail'),
-                'image':                get_thumbnail(get_volume_info(volume_info,'imageLinks'),'thumbnail'),
-                'language':             get_volume_info(volume_info,'language')}
+    try: 
+        if json['totalItems']!=0 and 'volumeInfo' in json['items'][0].keys():
+            volume_info = json['items'][0]['volumeInfo']
+            return {'goog_id':              get_id(json),
+                    'book_title':           get_volume_info(volume_info,'title'),
+                    'book_link':            get_volume_info(volume_info, 'infoLink'),
+                    'isbn':                 isbn,
+                    'year_first_published': get_volume_info(volume_info,'publishedDate'),
+                    'publisher':            get_volume_info(volume_info,'publisher'),
+                    'author':               get_volume_info(volume_info,'authors'),
+                    'num_pages':            get_volume_info(volume_info,'pageCount'),
+                    'description':          get_volume_info(volume_info,'description'),
+                    'genres':               get_volume_info(volume_info,'categories'),
+                    'num_ratings':          get_volume_info(volume_info,'ratingsCount'),
+                    'average_rating':       get_volume_info(volume_info,'averageRating'),
+                    'image-S':              get_thumbnail(get_volume_info(volume_info,'imageLinks'),'smallThumbnail'),
+                    'image':                get_thumbnail(get_volume_info(volume_info,'imageLinks'),'thumbnail'),
+                    'language':             get_volume_info(volume_info,'language')}
+        else:
+            return ''
 
+    except KeyError as e:
+        print(e, isbn)
+        exit(0)    
 
 def condense_books(books_directory_path):
 
@@ -76,13 +84,14 @@ def main():
     parser.add_argument('--format', type=str, action="store", default="json",
                         dest="format", choices=["json", "csv"],
                         help="set file output format")
+    parser.add_argument('--filename', type=str)
     args = parser.parse_args()
 
-    df_books = pd.read_csv('books_final.csv')
+    df_books = pd.read_csv(args.filename, encoding='unicode-escape')
 
-    book_ids              = df_books['ISBN'].values
-    books_already_scraped =  [file_name.replace('_book-metadata.json', '').split('-')[0] for file_name in os.listdir(args.output_directory_path) if file_name.endswith('.json') and not file_name.startswith('all_books')]
-    books_to_scrape       = [isbn for isbn in book_ids if isbn not in books_already_scraped]
+    book_ids              = df_books['isbn'].apply(lambda x: x.strip().upper().zfill(10)).values
+    books_already_scraped =  [file_name.replace('_book-metadata.json', '').split('-')[0].upper() for file_name in os.listdir(args.output_directory_path) if file_name.endswith('.json') and not file_name.startswith('all_books')]
+    books_to_scrape       = [isbn.upper() for isbn in book_ids if isbn.upper() not in books_already_scraped]
     condensed_books_path   = args.output_directory_path + '/all_books'
 
     for i, isbn in enumerate(books_to_scrape):
@@ -93,7 +102,7 @@ def main():
             book = scrape_book(isbn)
             
             # Add book metadata to file name to be more specific
-            filename = args.output_directory_path + '/' + str(isbn) + '-' + '_book-metadata.json'
+            filename = args.output_directory_path + '/' + str(isbn).upper() + '-' + '_book-metadata.json'
             json.dump(book, open(filename,'w'))
 
             print('=============================')

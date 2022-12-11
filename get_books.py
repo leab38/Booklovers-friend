@@ -5,6 +5,7 @@ import os
 import re
 import time
 
+import selenium
 from urllib.request import urlopen
 from urllib.error import HTTPError
 import bs4
@@ -158,7 +159,7 @@ def get_id(url):
     
 def scrape_book(isbn,book_id):
     if isbn: # BX dataset only has ISBN. Most of the GR dataset also, but some... do not.
-        url = 'https://www.goodreads.com/search/?q='+isbn
+        url = 'https://www.goodreads.com/search/?q=' + isbn
         
     elif book_id: # GR dataset items missing ISBN
         url = 'https://www.goodreads.com/book/show/' + book_id
@@ -168,7 +169,7 @@ def scrape_book(isbn,book_id):
     time.sleep(3)
 
     if soup.find('h1', {'id': 'bookTitle'}):
-        return {'book_id':              get_id(source.url),
+        return {'goodreads_book_id':              get_id(source.url),
                 'book_title':           ' '.join(soup.find('h1', {'id': 'bookTitle'}).text.split()),
                 "book_series":          get_series_name(soup),
                 "book_series_uri":      get_series_uri(soup),
