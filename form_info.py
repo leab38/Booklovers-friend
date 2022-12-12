@@ -1,7 +1,8 @@
-from data_prep import config
+import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+sql_url = os.environ.get('blf_sql')
 # Add the new information (location) to the user database, receives dataframe and location, returns dataframe
 def add_user(df, location):
     data = [location, None]
@@ -18,7 +19,7 @@ def get_isbn(df, book_title):
     return df[df['Book-Title']==book_title]['ISBN'].iloc[0]
 
 def get_blf_book_id(title):
-    sql_url = config.sql_url
+    
     conn = None
     error = None
     updated_rows = 0

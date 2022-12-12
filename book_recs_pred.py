@@ -1,13 +1,14 @@
-from data_prep import config
+# from data_prep import config
 import joblib
 import numpy as np
+import os
 import pandas as pd
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.neighbors import NearestNeighbors
 
-sql_url = config.sql_url
+sql_url = os.environ.get('blf_sql')
 
 def bayes_sum(N, mu):
     return lambda x: (x.sum() + mu*N) / (x.count() + N)
@@ -147,7 +148,17 @@ def get_recs_by_user(blf_book_id,title):
         conn = psycopg2.connect(sql_url)
         cursor = conn.cursor(cursor_factory=RealDictCursor)
 
-        query = "SELECT user_id FROM ratings WHERE blf_book_id = %(blf_book_id)s and book_rating = %(book_rating)s and title != %(title)s"
+        query = """WITH ratings_rc AS (
+                SELECT ROW_NUMBER() over () AS rn,
+                        user_id,
+                        blf_book_id,
+                        book_rating
+                FROM ratings
+            )
+            SELECT rn, user_id
+            FROM ratings_rc
+            INNER JOIN books using (blf_book_id)
+            WHERE blf_book_id = %(blf_book_id)s and book_rating = %(book_rating)s and title != %(title)s"""
         cursor.execute(query, params)
         ratings_dict = cursor.fetchall()
 
@@ -155,15 +166,15 @@ def get_recs_by_user(blf_book_id,title):
         print(sim_user_ratings)
 
         # Get ratings (as dictionary) for the user with the max number of reviewed books
-        by_user_ratings = joblib.load('C:/Users/leab3/Documents/GitHub/Booklovers-friend/by_user_ratings.pkl')
-        features = joblib.load('C:/Users/leab3/Documents/GitHub/Booklovers-friend/features.pkl')
+        by_user_ratings = joblib.load('by_user_ratings.pkl')
+        features = joblib.load('features.pkl')
 
         # Load the model from the file
-        nn = joblib.load('C:/Users/leab3/Documents/GitHub/Booklovers-friend/nn.pkl')
+        nn = joblib.load('nn.pkl')
         
         # Use the loaded model to make predictions
-        dists, indices = nn.kneighbors(features[by_user_ratings.index.get_indexer(by_user_ratings[by_user_ratings.index.isin(sim_user_ratings['user_id'])].index.tolist())])
-        neighbors = [by_user_ratings.index[i] for i in indices[0]][1:]
+        dists, indices = nn.kneighbors(features[sim_user_ratings.rn])
+        neighbors = [sim_user_ratings.rn[i] for i in indices[0]][1:]
 
         params = {'neighbors': tuple(neighbors), 'blf_book_id': blf_book_id}
         print(neighbors)

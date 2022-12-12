@@ -1,4 +1,9 @@
+Argparse
 Flask==2.2.2
 Gunicorn
+Joblib
+Numpy
+Os
 Pandas
+Psycopg2
 Sklearn

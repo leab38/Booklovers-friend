@@ -1,4 +1,3 @@
-from data_prep import config
 import form_info
 import book_recs_pred
 
