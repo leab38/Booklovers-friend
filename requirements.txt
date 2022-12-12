@@ -5,4 +5,4 @@ Joblib
 Numpy
 Pandas
 Psycopg2
-Sklearn
+Sklearn==1.1.2
