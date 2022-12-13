@@ -1,8 +1,8 @@
 import os
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 sql_url = os.environ.get('blf_sql')
+
 # Add the new information (location) to the user database, receives dataframe and location, returns dataframe
 def add_user(df, location):
     data = [location, None]
@@ -32,7 +32,12 @@ def get_blf_book_id(title):
         cursor = conn.cursor()
 
         # select only users from that location
-        query = "SELECT blf_book_id FROM books INNER JOIN ratings using(blf_book_id) WHERE book_rating=5 AND title LIKE %(title)s ESCAPE '' ORDER BY blf_book_id LIMIT 1"
+        query = """SELECT blf_book_id 
+                   FROM books 
+                   INNER JOIN ratings using(blf_book_id) 
+                   WHERE book_rating=5.0 AND title LIKE %(title)s ESCAPE '' 
+                   ORDER BY blf_book_id 
+                   LIMIT 1"""
         cursor.execute(query, params)
         blf_book_id = cursor.fetchall()
         updated_rows = cursor.rowcount
