@@ -173,7 +173,7 @@ def get_recs_by_user(blf_book_id,title):
         nn = joblib.load('nn.pkl')
         
         # Use the loaded model to make predictions
-        dists, indices = nn.kneighbors(features[sim_user_ratings.rn])
+        dists, indices = nn.kneighbors(features[])
         neighbors = [sim_user_ratings.rn[i] for i in indices[0]][1:]
 
         params = {'neighbors': tuple(neighbors), 'blf_book_id': blf_book_id}
