@@ -35,12 +35,12 @@ Once my model was working with the Book Crossing dataset, then I looked next int
 2.  Some of the Goodreads dataset (700 books) did not have an ISBN. Since ISBN was the link between the datsets and the only overlapping book identification number, this had to be resolved by scraping Goodreads for updated information to ensure all books have an ISBN.
 3.  The book list merging included:
 
-*   Find and replace missing ISBNs for Goodreads books.
-*   Merge the two datasets.
-*   For books that were in both datasets, compare overlapping column data, which includes: title, author(s), year of publication, book cover URLs.
-*   I decided to keep the title from the Book Crossing dataset, as I found less broken/missing letters in titles that were not in English.
-*   I kept the authors from the Goodreads dataset, as a review of a sample of these was more accurate.
-*   For year of publication and image URLs the Book Crossing dataset was kept as default.
+  *   Find and replace missing ISBNs for Goodreads books.
+  *   Merge the two datasets.
+  *   For books that were in both datasets, compare overlapping column data, which includes: title, author(s), year of publication, book cover URLs.
+  *   I decided to keep the title from the Book Crossing dataset, as I found less broken/missing letters in titles that were not in English.
+  *   I kept the authors from the Goodreads dataset, as a review of a sample of these was more accurate.
+  *   For year of publication and image URLs the Book Crossing dataset was kept as default.
 
 5.  The user list merge was simpler than the booklist (as there were fewer elements). The steps were the below:
 
