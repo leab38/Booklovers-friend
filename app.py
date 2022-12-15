@@ -56,4 +56,4 @@ def data():
 def bookdetails(blf_book_id):
     book = book_recs_pred.get_books([blf_book_id]).to_dict(orient='records')[0]
     print(book)
-    return render_template('book_details.html', book = book)
+    return render_template('book_details_new.html', book = book)
