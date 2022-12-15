@@ -62,4 +62,4 @@ The recommendation model groups all of the user ratings based on user ID and the
 The Booklover's Friend website was built using the Python Flask framework. The About Page graph was made using Altair.
 
 ![User Location Counts](https://raw.githubusercontent.com/leab38/Booklovers-friend/main/images/user_location_count.png)
-![Book Rating Counts](https://raw.githubusercontent.com/leab38/Booklovers-friend/main/images/ratings_book_count.png)
+![Book Rating Counts](https://raw.githubusercontent.com/leab38/Booklovers-friend/main/images/ratings_year_count.png)
