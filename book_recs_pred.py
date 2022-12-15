@@ -135,7 +135,7 @@ def get_recs_by_user(blf_book_id,title):
     rating = 5.0
 
     # Create params for SQL query
-    params = {'blf_book_id': blf_book_id, 'book_rating': rating,'title': title}
+    params = {'blf_book_id': blf_book_id, 'book_rating': rating}
     print(params)
 
     error = None
@@ -148,17 +148,7 @@ def get_recs_by_user(blf_book_id,title):
         conn = psycopg2.connect(sql_url)
         cursor = conn.cursor(cursor_factory=RealDictCursor)
 
-        query = """WITH ratings_rc AS (
-                SELECT ROW_NUMBER() over () AS rn,
-                        user_id,
-                        blf_book_id,
-                        book_rating
-                FROM ratings
-            )
-            SELECT rn, user_id
-            FROM ratings_rc
-            INNER JOIN books using (blf_book_id)
-            WHERE blf_book_id = %(blf_book_id)s and book_rating = %(book_rating)s and title != %(title)s"""
+        query = "SELECT user_id FROM ratings WHERE blf_book_id = %(blf_book_id)s and book_rating = %(book_rating)s"
         cursor.execute(query, params)
         ratings_dict = cursor.fetchall()
 
@@ -169,16 +159,21 @@ def get_recs_by_user(blf_book_id,title):
         by_user_ratings = joblib.load('by_user_ratings.pkl')
         features = joblib.load('features.pkl')
 
+        sim_user_features = features[by_user_ratings.index.get_indexer(by_user_ratings[by_user_ratings.index.isin(sim_user_ratings['user_id'].tolist())].index.tolist())]
+
         # Load the model from the file
         nn = joblib.load('nn.pkl')
         
         # Use the loaded model to make predictions
-        dists, indices = nn.kneighbors(features[])
-        neighbors = [sim_user_ratings.rn[i] for i in indices[0]][1:]
+        dists, indices = nn.kneighbors(sim_user_features)
+        neighbors = [by_user_ratings.index[i] for i in indices[0]][1:]
 
-        params = {'neighbors': tuple(neighbors), 'blf_book_id': blf_book_id}
+        params = {'neighbors': tuple(neighbors), 'blf_book_id': blf_book_id, 'title': title}
         print(neighbors)
-        query = "SELECT * FROM ratings WHERE user_id IN %(neighbors)s and blf_book_id != %(blf_book_id)s"
+        query = """SELECT * 
+                   FROM ratings 
+                   INNER JOIN books using (blf_book_id)
+                   WHERE user_id IN %(neighbors)s and blf_book_id != %(blf_book_id)s and title !=%(title)s"""
         cursor.execute(query, params)
         ratings_grp_dict = cursor.fetchall()
         updated_rows = cursor.rowcount
