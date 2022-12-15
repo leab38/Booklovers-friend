@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .error {
+        color: red;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.17.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"name": "data-d0b35946506b14293b5dfeeb7ff5e2b3"}, "mark": {"type": "bar", "color": "teal"}, "encoding": {"color": {"field": "average_rating", "type": "quantitative"}, "x": {"field": "title", "title": "Book Title", "type": "nominal"}, "y": {"field": "count", "title": "Number of Ratings", "type": "quantitative"}}, "height": 500, "title": "Top 20 Books - By Number of Ratings", "width": 600, "$schema": "https://vega.github.io/schema/vega-lite/v4.17.0.json", "datasets": {"data-d0b35946506b14293b5dfeeb7ff5e2b3": [{"blf_book_id": 271214, "count": 22806, "average_rating": 4.2797070946242215, "title": "The Hunger Games (The Hunger Games, #1)"}, {"blf_book_id": 271215, "count": 21850, "average_rating": 4.351350114416476, "title": "Harry Potter And The Sorcerer's Stone (Harry Potter, #1)"}, {"blf_book_id": 271217, "count": 19088, "average_rating": 4.3293692372171, "title": "To Kill A Mockingbird"}, {"blf_book_id": 271216, "count": 16931, "average_rating": 3.214340558738409, "title": "Twilight (Twilight, #1)"}, {"blf_book_id": 271218, "count": 16604, "average_rating": 3.7722235605878103, "title": "The Great Gatsby"}, {"blf_book_id": 271230, "count": 16549, "average_rating": 4.133421959030757, "title": "Catching Fire (The Hunger Games, #2)"}, {"blf_book_id": 271233, "count": 15953, "average_rating": 3.8531310725255437, "title": "Mockingjay (The Hunger Games, #3)"}, {"blf_book_id": 271231, "count": 15870, "average_rating": 4.4162255828607435, "title": "Harry Potter And The Prisoner Of Azkaban (Harry Potter, #3)"}, {"blf_book_id": 271236, "count": 15827, "average_rating": 4.219498325646048, "title": "Harry Potter And The Chamber Of Secrets (Harry Potter, #2)"}, {"blf_book_id": 271237, "count": 15716, "average_rating": 4.407705523033851, "title": "Harry Potter And The Goblet Of Fire (Harry Potter, #4)"}, {"blf_book_id": 271220, "count": 15568, "average_rating": 4.147835303186023, "title": "The Hobbit"}, {"blf_book_id": 271238, "count": 15304, "average_rating": 4.525940930475692, "title": "Harry Potter And The Deathly Hallows (Harry Potter, #7)"}, {"blf_book_id": 271234, "count": 15269, "average_rating": 4.356539393542472, "title": "Harry Potter And The Order Of The Phoenix (Harry Potter, #5)"}, {"blf_book_id": 271240, "count": 15081, "average_rating": 4.443339301107353, "title": "Harry Potter And The Half-Blood Prince (Harry Potter, #6)"}, {"blf_book_id": 271226, "count": 14885, "average_rating": 4.024386966745046, "title": "1984"}, {"blf_book_id": 271221, "count": 14490, "average_rating": 3.7083160800552104, "title": "The Catcher In The Rye"}, {"blf_book_id": 271229, "count": 14382, "average_rating": 3.9947851481017937, "title": "The Girl With The Dragon Tattoo (Millennium, #1)"}, {"blf_book_id": 271227, "count": 14331, "average_rating": 3.8255181075989113, "title": "Animal Farm"}, {"blf_book_id": 271241, "count": 13557, "average_rating": 3.663052297705982, "title": "Lord Of The Flies"}, {"blf_book_id": 271223, "count": 13453, "average_rating": 4.185609157808667, "title": "Pride And Prejudice"}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div class="error" style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>
