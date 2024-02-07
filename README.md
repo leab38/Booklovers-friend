@@ -1,6 +1,8 @@
 # Booklovers-friend
 Booklover's Friend is a site dedicated to helping you figure out what to read next. This website uses two datasets to provide you with recommendations based on your location and your last "5 star" read.
 
+[Github Link](https://github.com/leab38/Booklovers-friend)
+
 Recommendation Engine
 ---------------------
 
